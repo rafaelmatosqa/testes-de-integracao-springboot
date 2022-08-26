@@ -1,4 +1,3 @@
-Workflow name
 name: CI/CD Pipeline
 on:
   #Manually trigger workflow runs
