@@ -17,6 +17,7 @@ import integracao.rest.contatos.Contato;
 import integracao.rest.repositories.ContatoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -154,5 +155,63 @@ public class AgendaControllerIntegrationTest {
 		contatoRepository.deleteAll();
 	}
 
+	@Test
+	public void alterarDeveRetornarMensagemDeErro() {
+		contato.setDdd(null);
+		contato.setTelefone(null);
+		HttpEntity<Contato> httpEntity = new HttpEntity<>(contato);
+		ResponseEntity<List<String>> resposta =
+				testRestTemplate.exchange("/agenda/alterar/{id}",HttpMethod.PUT
+						,httpEntity, new ParameterizedTypeReference<List<String>>() {},contato.getId());
+
+		Assert.assertEquals(HttpStatus.BAD_REQUEST,resposta.getStatusCode());
+		Assert.assertTrue(resposta.getBody().contains("O DDD deve ser preenchido"));
+		Assert.assertTrue(resposta.getBody().contains("O Telefone deve ser preenchido"));
+	}
+
+	@Test
+	public void alterarDeveAlterarContato() {
+		contato.setNome("João");
+		HttpEntity<Contato> httpEntity = new HttpEntity<>(contato);
+		ResponseEntity<Contato> resposta =
+				testRestTemplate.exchange("/agenda/alterar/{id}",HttpMethod.PUT,httpEntity
+						, Contato.class,contato.getId());
+
+		Assert.assertEquals(HttpStatus.CREATED,resposta.getStatusCode());
+		Contato resultado = resposta.getBody();
+		Assert.assertEquals(contato.getId(), resultado.getId());
+		Assert.assertEquals(ddd, resultado.getDdd());
+		Assert.assertEquals(telefone, resultado.getTelefone());
+		Assert.assertEquals("João", resultado.getNome());
+	}
+
+	@Test
+	public void alterarDeveAlterarContatoComPut() {
+		contato.setNome("Pedro");
+		testRestTemplate.put("/agenda/alterar/{id}",contato,contato.getId());
+
+		Contato resultado = contatoRepository.findById(contato.getId()).get();
+		Assert.assertEquals(ddd, resultado.getDdd());
+		Assert.assertEquals(telefone, resultado.getTelefone());
+		Assert.assertEquals("Pedro", resultado.getNome());
+	}
+
+	@Test
+	public void removerDeveExcluirContato() {
+		ResponseEntity<Contato> resposta =
+				testRestTemplate.exchange("/agenda/remover/{id}",HttpMethod.DELETE,null
+						, Contato.class,contato.getId());
+
+		Assert.assertEquals(HttpStatus.NO_CONTENT,resposta.getStatusCode());
+		Assert.assertNull(resposta.getBody());
+	}
+
+	@Test
+	public void removerDeveExcluirContatoComDelete() {
+		testRestTemplate.delete("/agenda/remover/"+contato.getId());
+
+		Optional<Contato> resultado = contatoRepository.findById(contato.getId());
+		Assert.assertEquals(Optional.empty(), resultado);
+	}
 
 }
