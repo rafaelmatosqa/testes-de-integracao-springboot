@@ -1,4 +1,6 @@
-package integracao.rest.contatos;
+package integracao.rest.services;
+
+import integracao.rest.contatos.Contato;
 
 import java.util.List;
 import java.util.Optional;
