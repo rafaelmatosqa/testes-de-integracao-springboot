@@ -1,5 +1,7 @@
 package integracao.rest.contatos;
 
+import org.hibernate.envers.Audited;
+
 import java.io.Serializable;
 
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 
 
 @Entity
+@Audited
 public class Contato implements Serializable{
 
 	@Id
