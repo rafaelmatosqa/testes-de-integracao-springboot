@@ -1,4 +1,4 @@
-package integracao.rest.agenda;
+package integracao.rest.controllers;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import integracao.rest.contatos.Contato;
-import integracao.rest.contatos.ContatoService;
+import integracao.rest.services.ContatoService;
 
 @RestController
 @RequestMapping("/agenda")
